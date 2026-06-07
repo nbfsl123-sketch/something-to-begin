@@ -1,191 +1,188 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>周彬的 AI 数字分身 | 个人主页</title>
     <!-- 引入 Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // 配置 Tailwind 使用 class 模式切换暗色主题
+        tailwind.config = {
+            darkMode: 'class',
+        }
+        
+        // 初始化模式
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
+    <style>
+        /* 极简科技点阵网格 */
+        .tech-grid {
+            background-size: 32px 32px;
+            background-image: radial-gradient(circle, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+        }
+        .dark .tech-grid {
+            background-image: radial-gradient(circle, rgba(51, 65, 85, 0.18) 1px, transparent 1px);
+        }
+        /* 仅在电脑端隐藏默认鼠标 */
+        @media (min-width: 1024px) {
+            html, body, a, button, input, textarea, [role="button"] {
+                cursor: none !important;
+            }
+        }
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: rgba(51, 65, 85, 0.4);
+        }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-700 font-sans pb-16 min-h-screen relative overflow-x-hidden">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 font-sans pb-16 min-h-screen relative overflow-x-hidden transition-colors duration-300 tech-grid">
 
-    <!-- ================= 背景装饰光晕 ================= -->
-    <div class="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-        <!-- 左上角蓝色光晕 -->
-        <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-blue-200/20 rounded-full blur-[120px]"></div>
-        <!-- 右下角绿色光晕 -->
-        <div class="absolute top-1/2 -right-40 w-[600px] h-[600px] bg-emerald-200/15 rounded-full blur-[120px]"></div>
+    <!-- ================= Canvas 极细蓝色激光轨迹画布 ================= -->
+    <canvas id="trail-canvas" class="fixed inset-0 pointer-events-none z-[9998] hidden lg:block"></canvas>
+
+    <!-- ================= 背景装饰微光 ================= -->
+    <div class="absolute inset-0 -z-20 overflow-hidden pointer-events-none">
+        <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-blue-200/20 dark:bg-blue-900/10 rounded-full blur-[120px]"></div>
+        <div class="absolute top-1/2 -right-40 w-[600px] h-[600px] bg-emerald-200/15 dark:bg-emerald-900/10 rounded-full blur-[120px]"></div>
     </div>
 
-    <!-- 主容器 -->
-    <div class="max-w-7xl mx-auto px-4 pt-10 md:pt-16">
+    <!-- ================= 浮动主题一键切换按钮 ================= -->
+    <button onclick="toggleTheme()" class="fixed top-6 right-6 z-50 p-3 rounded-full bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border border-slate-200/60 dark:border-slate-800 shadow-lg text-slate-600 dark:text-amber-400 hover:scale-110 active:scale-95 transition-all duration-200" title="切换深/浅模式">
+        <svg id="theme-sun" class="w-5 h-5 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+        <svg id="theme-moon" class="w-5 h-5 block dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+    </button>
+
+    <!-- 【重要重构】主容器：
+         1. 最大宽度定在极具张力的 1380px 
+         2. 加入 px-6 lg:px-12 py-10 大量外边距，确保页面四周“有适度的呼吸空隙”，绝不贴边和局促
+    -->
+    <div class="max-w-[1380px] mx-auto px-6 lg:px-12 py-10 xl:py-14 relative z-10">
         
-        <!-- 双栏排版：大屏(lg)以上左右分栏，左侧固定，右侧滚动 -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- 双栏栅格：加大间距 (gap-10)，让中间适度留空 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             
-            <!-- ================= 左侧栏：个人名片与联系方式 (lg端占 4/12) ================= -->
-            <div class="lg:col-span-4 space-y-6 lg:sticky lg:top-8">
+            <!-- ================= 左侧栏：个人名片与基础档案 (lg端占 5/12) ================= -->
+            <div class="lg:col-span-5 xl:col-span-4 space-y-6 lg:sticky lg:top-10">
                 
-                <!-- 个人基础名片 -->
-                <header class="bg-white rounded-2xl p-6 shadow-md border border-slate-100 flex flex-col items-center text-center gap-4 relative overflow-hidden">
-                    <!-- 头像装饰 -->
+                <!-- 【重要修改】移除了 overflow-hidden，彻底解决了顶部寻找实习小徽章被切掉一半的问题 -->
+                <header class="bg-white/95 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-slate-200/50 dark:border-slate-800/60 flex flex-col items-center text-center gap-4 relative transition-all duration-300 hover:shadow-md">
+                    <!-- 头像徽章 -->
                     <div class="relative mt-2">
-                        <!-- 头像上面的悬浮徽章 -->
-                        <span class="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm border border-white whitespace-nowrap">
+                        <span class="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-[11px] font-bold px-3 py-0.5 rounded-full shadow-sm border border-white dark:border-slate-800 whitespace-nowrap">
                             🔥 寻找前端/全栈实习
                         </span>
-                        <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-500 to-emerald-400 flex items-center justify-center text-white text-3xl font-bold shadow-md border-4 border-white">
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-500 to-emerald-400 flex items-center justify-center text-white text-3xl font-bold shadow-md border-4 border-white dark:border-slate-800">
                             彬
                         </div>
                     </div>
                     
-                    <div>
-                        <h1 class="text-2xl font-bold text-slate-800 flex items-center justify-center gap-2">
+                    <!-- 名字与院校 -->
+                    <div class="w-full">
+                        <h1 class="text-3xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100">
                             周彬
                         </h1>
-                        <p class="text-sm font-semibold text-blue-600 mt-1">西安工业大学 · 软件工程</p>
-                        <p class="text-xs text-slate-400 mt-1">大三在读 · 积极求职中</p>
-                        
-                        <p class="text-sm text-slate-500 mt-4 leading-relaxed px-2">
-                            对事物好奇心强烈，热爱算法、全栈探索与 AI Agent 技术的自学者。
+                        <p class="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-1.5 tracking-wider">
+                            西安工业大学 · 软件工程专业 · 大三学生
                         </p>
                     </div>
 
-                    <!-- 个人兴趣标签 -->
-                    <div class="flex flex-wrap gap-2 justify-center mt-2">
-                        <span class="text-[11px] bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium">✨ 好奇心强烈</span>
-                        <span class="text-[11px] bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full font-medium">✈️ 旅游爱好</span>
-                        <span class="text-[11px] bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium">🤝 结识朋友</span>
+                    <!-- 完美还原的中文自我介绍 -->
+                    <div class="text-left w-full border-l-4 border-blue-500 pl-3.5 py-1 bg-slate-50/50 dark:bg-slate-950/20 rounded-r-xl border border-slate-100 dark:border-slate-900/20">
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mb-0.5">[ 关于我 ]</p>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
+                            一个正在求职学习 AI Agent 技术的大三学生。
+                        </p>
                     </div>
 
-                    <!-- 极简社交/联系人图标栏（已升级为不依赖外链的 SVG 原生图标） -->
-                    <div class="flex items-center gap-3 mt-4 pt-4 border-t border-slate-100 w-full justify-center">
-                        <!-- GitHub 链接 -->
-                        <a href="https://github.com/nbfsl123-sketch" target="_blank" title="GitHub" class="w-10 h-10 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-800 border border-slate-100 flex items-center justify-center transition-all">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+                    <!-- 原汁原味的个人标签 -->
+                    <div class="flex flex-wrap gap-2 justify-center mt-1 w-full">
+                        <span class="text-xs bg-blue-50/80 dark:bg-blue-950/30 text-blue-600 dark:text-blue-300 px-3 py-1 rounded-full border border-blue-100/40 dark:border-blue-900/20">✨ 好奇心强烈</span>
+                        <span class="text-xs bg-emerald-50/80 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded-full border border-emerald-100/40 dark:border-emerald-900/20">✈️ 旅游</span>
+                        <span class="text-xs bg-slate-100/80 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 px-3 py-1 rounded-full border border-slate-200/40 dark:border-slate-800/20">🤝 结识朋友</span>
+                    </div>
+
+                    <!-- 扁平卡片化主要按钮 (高可读性) -->
+                    <div class="grid grid-cols-3 gap-3 mt-6 pt-5 border-t border-slate-100 dark:border-slate-800/80 w-full">
+                        <a href="https://github.com/nbfsl123-sketch" target="_blank" title="GitHub" class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50/60 dark:bg-slate-950/30 hover:bg-blue-500 dark:hover:bg-blue-500 text-slate-600 dark:text-slate-400 hover:text-white dark:hover:text-white border border-slate-100 dark:border-slate-800/60 hover:border-transparent dark:hover:border-transparent transition-all duration-300 group hover:-translate-y-1 hover:shadow-md">
+                            <svg class="w-5 h-5 mb-1 text-slate-500 dark:text-slate-400 group-hover:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+                            <span class="text-[11px] font-medium tracking-wide">GitHub</span>
                         </a>
-                        <!-- 电话联系 -->
-                        <a href="tel:17607927661" title="拨打电话" class="w-10 h-10 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-blue-500 border border-slate-100 flex items-center justify-center transition-all">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        <a href="tel:17607927661" title="拨打电话" class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50/60 dark:bg-slate-950/30 hover:bg-emerald-500 dark:hover:bg-emerald-500 text-slate-600 dark:text-slate-400 hover:text-white dark:hover:text-white border border-slate-100 dark:border-slate-800/60 hover:border-transparent dark:hover:border-transparent transition-all duration-300 group hover:-translate-y-1 hover:shadow-md">
+                            <svg class="w-5 h-5 mb-1 text-slate-500 dark:text-slate-400 group-hover:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                            <span class="text-[11px] font-medium tracking-wide">拨打电话</span>
                         </a>
-                        <!-- 邮箱联系 -->
-                        <a href="mailto:zhoubin_work@example.com" title="发送邮件" class="w-10 h-10 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-emerald-500 border border-slate-100 flex items-center justify-center transition-all">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                        <a href="mailto:zhoubin_work@example.com" title="发送邮件" class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50/60 dark:bg-slate-950/30 hover:bg-cyan-500 dark:hover:bg-cyan-500 text-slate-600 dark:text-slate-400 hover:text-white dark:hover:text-white border border-slate-100 dark:border-slate-800/60 hover:border-transparent dark:hover:border-transparent transition-all duration-300 group hover:-translate-y-1 hover:shadow-md">
+                            <svg class="w-5 h-5 mb-1 text-slate-500 dark:text-slate-400 group-hover:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                            <span class="text-[11px] font-medium tracking-wide">发送邮件</span>
                         </a>
                     </div>
                 </header>
 
-                <!-- 专业技能档案 -->
-                <section class="bg-white rounded-2xl p-6 shadow-md border border-slate-100">
-                    <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <!-- User SVG -->
-                        <svg class="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        核心技能栈
-                    </h2>
+                <!-- 核心技能栈 -->
+                <section class="bg-white/95 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-slate-200/50 dark:border-slate-800/60 transition-all duration-300 hover:shadow-md">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            核心技能栈
+                        </h2>
+                        <span class="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded font-medium">技能清单</span>
+                    </div>
                     <div class="space-y-3 text-xs">
-                        <div class="p-2.5 bg-slate-50 rounded-xl">
-                            <span class="text-slate-400 block mb-1">前端与全栈</span>
-                            <span class="font-medium text-slate-700">HTML5 / CSS3 / JavaScript / Tailwind CSS</span>
+                        <div class="p-2.5 bg-slate-50/50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-900/40 rounded-xl transition-all hover:bg-blue-500/5 text-[12px]">
+                            <span class="text-slate-400 dark:text-slate-500 block mb-1">前端与全栈</span>
+                            <span class="font-medium text-slate-700 dark:text-slate-300">HTML5 / CSS3 / JavaScript / Tailwind CSS</span>
                         </div>
-                        <div class="p-2.5 bg-slate-50 rounded-xl">
-                            <span class="text-slate-400 block mb-1">算法与编程</span>
-                            <span class="font-medium text-slate-700">算法训练、数理逻辑与程序设计基础</span>
+                        <div class="p-2.5 bg-slate-50/50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-900/40 rounded-xl transition-all hover:bg-emerald-500/5 text-[12px]">
+                            <span class="text-slate-400 dark:text-slate-500 block mb-1">算法与编程</span>
+                            <span class="font-medium text-slate-700 dark:text-slate-300">算法训练、数理逻辑与程序设计基础</span>
                         </div>
-                        <div class="p-2.5 bg-slate-50 rounded-xl">
-                            <span class="text-slate-400 block mb-1">AI 探索</span>
-                            <span class="font-medium text-slate-700">大语言模型 API 调用、AI Agent 协同设计</span>
+                        <div class="p-2.5 bg-slate-50/50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-900/40 rounded-xl transition-all hover:bg-cyan-500/5 text-[12px]">
+                            <span class="text-slate-400 dark:text-slate-500 block mb-1">AI 探索</span>
+                            <span class="font-medium text-slate-700 dark:text-slate-300">大语言模型 API 调用、AI Agent 协同设计</span>
                         </div>
                     </div>
+                </section>
+
+                <!-- 主题自适应「终端控制台」组件 -->
+                <section class="bg-slate-100/80 dark:bg-slate-950 text-slate-800 dark:text-emerald-400 font-mono p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 text-[11px] leading-relaxed relative overflow-hidden transition-all duration-300">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-50 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+                        </div>
+                        <span class="text-[10px] text-slate-400 dark:text-emerald-500/60 bg-slate-200/50 dark:bg-emerald-950/40 px-2 py-0.5 rounded">系统日志</span>
+                    </div>
+                    <div>$ zhoubin --status</div>
+                    <div class="text-slate-500 dark:text-slate-400">-> Fetching developer profile...</div>
+                    <div class="text-slate-750 dark:text-slate-200">🎓 院校名称: 西安工业大学</div>
+                    <div class="text-slate-750 dark:text-slate-200">🤖 AI_Engine : <span class="text-blue-500 dark:text-blue-400 animate-pulse font-semibold">[Active]</span></div>
+                    <div class="text-slate-750 dark:text-slate-200">🔍 实习意向: 前端 / 全栈开发实习</div>
+                    <div class="text-emerald-600 dark:text-emerald-400 font-semibold">-> Ready to be deployed successfully.</div>
                 </section>
                 
             </div>
 
-            <!-- ================= 右侧栏：高光荣誉、项目留空与聊天分身 (lg端占 8/12) ================= -->
-            <div class="lg:col-span-8 space-y-8">
+            <!-- ================= 右侧栏：聊天与成果区 (lg端占 7/12 或 8/12) ================= -->
+            <div class="lg:col-span-7 xl:col-span-8 space-y-8">
                 
-                <!-- 1. 竞赛荣誉 (Memorable Highlights) -->
-                <section class="bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-2xl p-6 border border-blue-100/50">
-                    <h2 class="text-md font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <!-- Award SVG -->
-                        <svg class="w-5 h-5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"></circle><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path></svg>
-                        竞赛荣誉 (Highlights)
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- 荣誉卡片 1（全国高校计算机能力挑战赛） -->
-                        <div class="bg-white rounded-xl p-4 border border-blue-50 shadow-sm flex flex-col justify-between">
-                            <div>
-                                <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center mb-2">
-                                    <!-- Trophy SVG -->
-                                    <svg class="w-5 h-5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 1 6 6v1H6V8a6 6 0 0 1 6-6z"></path></svg>
-                                </div>
-                                <h3 class="font-bold text-slate-800 text-sm">全国高校计算机能力挑战赛</h3>
-                                <p class="text-[11px] text-slate-400 mt-0.5">全国决赛 · 算法/软件开发方向</p>
-                            </div>
-                            <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full w-max mt-3">
-                                全国一等奖 🏆
-                            </span>
-                        </div>
-
-                        <!-- 荣誉卡片 2 -->
-                        <div class="bg-white rounded-xl p-4 border border-blue-50 shadow-sm flex flex-col justify-between">
-                            <div>
-                                <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mb-2">
-                                    <!-- Medal SVG -->
-                                    <svg class="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15"></path><circle cx="12" cy="15" r="5"></circle></svg>
-                                </div>
-                                <h3 class="font-bold text-slate-800 text-sm">蓝桥杯全国软件大赛</h3>
-                                <p class="text-[11px] text-slate-400 mt-0.5">个人程序设计全国总决赛</p>
-                            </div>
-                            <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full w-max mt-3">
-                                全国二等奖 🥈
-                            </span>
-                        </div>
-
-                        <!-- 荣誉卡片 3 -->
-                        <div class="bg-white rounded-xl p-4 border border-blue-50 shadow-sm flex flex-col justify-between">
-                            <div>
-                                <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mb-2">
-                                    <!-- Users SVG -->
-                                    <svg class="w-5 h-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                                </div>
-                                <h3 class="font-bold text-slate-800 text-sm">程序设计天梯赛</h3>
-                                <p class="text-[11px] text-slate-400 mt-0.5">团体程序设计天梯赛</p>
-                            </div>
-                            <span class="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full w-max mt-3">
-                                团体全国三等奖 🥉
-                            </span>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 2. 实战项目留空区 (Active Projects - 已修改为完全空缺整理状态) -->
-                <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-                    <h2 class="text-md font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <!-- Folder SVG -->
-                        <svg class="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path></svg>
-                        实战项目 (Active Projects)
-                    </h2>
-                    
-                    <div class="border-2 border-dashed border-slate-200 rounded-2xl p-10 flex flex-col items-center justify-center text-center gap-3 bg-slate-50/50">
-                        <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
-                            <!-- Folder icon inside placeholder -->
-                            <svg class="w-6 h-6 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path></svg>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-slate-700 text-sm">项目档案整理中...</h3>
-                            <p class="text-xs text-slate-400 mt-1.5 max-w-md leading-relaxed">
-                                目前的项目资料及架构正在重新梳理和升级，此区域暂时留空。后续更新的技术细节和 AI 开发成果将陆续在此发布，敬请期待！
-                            </p>
-                        </div>
-                        <a href="https://github.com/nbfsl123-sketch" target="_blank" class="text-xs text-blue-500 hover:text-blue-600 font-semibold flex items-center gap-1 mt-3">
-                            前往 GitHub 关注我的最新更新 
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg>
-                        </a>
-                    </div>
-                </section>
-
-                <!-- 3. 数字分身聊天区 (Digital Twin Chat) -->
-                <section class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden flex flex-col h-[550px]">
+                <!-- 【首屏聊天入口】 -->
+                <section class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/50 dark:border-slate-800/60 overflow-hidden flex flex-col h-[550px] transition-all duration-300 hover:shadow-md">
                     <!-- 聊天头部 -->
                     <div class="bg-gradient-to-r from-blue-500 to-cyan-500 p-4 text-white flex items-center justify-between shadow-sm">
                         <div class="flex items-center gap-3">
@@ -195,16 +192,18 @@
                                 <p class="text-xs text-blue-100 font-light">在线 · 随时向我的数字分身提问</p>
                             </div>
                         </div>
-                        <!-- Message Square SVG -->
-                        <svg class="w-5 h-5 text-blue-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        
+                        <div class="flex items-start gap-2 font-mono text-[10px] bg-black/15 text-blue-50 px-2 py-1 rounded border border-white/10">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+                            <span>延时: 42ms // AI数字分身</span>
+                        </div>
                     </div>
 
                     <!-- 聊天消息流区域 -->
-                    <div id="chat-box" class="flex-1 p-4 overflow-y-auto space-y-4 text-sm bg-slate-50/40">
-                        <!-- 欢迎语 -->
+                    <div id="chat-box" class="flex-1 p-4 overflow-y-auto space-y-4 text-sm bg-slate-50/40 dark:bg-slate-950/20">
                         <div class="flex items-start gap-2">
                             <div class="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold shrink-0">彬</div>
-                            <div class="bg-white border border-slate-100 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-slate-700 shadow-sm leading-relaxed">
+                            <div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800/80 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-slate-700 dark:text-slate-300 shadow-sm leading-relaxed text-[14px]">
                                 你好呀！我是周彬的数字分身。
 
 我很荣幸在算法领域积累了**全国高校计算机能力挑战赛国一、蓝桥杯国二、天梯赛团体国三**等荣誉。我性格随和，对事物有着强烈的好奇心。
@@ -215,32 +214,112 @@
                     </div>
 
                     <!-- 快捷提问推荐区 -->
-                    <div class="p-3 bg-white border-t border-slate-100 flex flex-wrap gap-2">
-                        <button onclick="askQuestion('你在忙什么？')" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1.5 rounded-full transition-colors border border-blue-100">
+                    <div class="p-3 bg-white dark:bg-slate-900 border-t border-slate-200/50 dark:border-slate-800/60 flex flex-wrap gap-2">
+                        <button onclick="askQuestion('你在忙什么？')" class="text-xs bg-blue-50/80 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-600 dark:text-blue-300 px-3 py-1.5 rounded-full border border-blue-100/60 dark:border-blue-900 transition-colors">
                             🔍 你在忙什么？
                         </button>
-                        <button onclick="askQuestion('介绍下项目经历')" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full transition-colors border border-emerald-100">
+                        <button onclick="askQuestion('介绍下项目经历')" class="text-xs bg-emerald-50/80 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-3 py-1.5 rounded-full border border-emerald-100/60 dark:border-emerald-900 transition-colors">
                             💻 介绍下项目经历
                         </button>
-                        <button onclick="askQuestion('怎么联系你？')" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-1.5 rounded-full transition-colors border border-amber-100">
+                        <button onclick="askQuestion('怎么联系你？')" class="text-xs bg-amber-50/80 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900 text-amber-700 dark:text-amber-300 px-3 py-1.5 rounded-full border border-amber-100/60 dark:border-amber-900 transition-colors">
                             ✉️ 怎么联系你？
                         </button>
                     </div>
 
                     <!-- 底部输入框 -->
-                    <form id="chat-form" onsubmit="handleSend(event)" class="p-3 bg-white border-t border-slate-100 flex gap-2 items-center">
-                        <input id="user-input" type="text" placeholder="向周彬的分身提问..." class="flex-1 px-4 py-2 border border-slate-200 rounded-full focus:outline-none focus:border-blue-400 text-sm" autocomplete="off">
+                    <form id="chat-form" onsubmit="handleSend(event)" class="p-3 bg-white dark:bg-slate-900 border-t border-slate-200/50 dark:border-slate-800/60 flex gap-2 items-center">
+                        <input id="user-input" type="text" placeholder="向周彬的分身提问..." class="flex-1 px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-full focus:outline-none focus:border-blue-400 text-sm text-slate-700 dark:text-slate-300" autocomplete="off">
                         <button type="submit" class="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors flex items-center justify-center">
-                            <!-- Send SVG -->
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                         </button>
                     </form>
                 </section>
+
+                <!-- 竞赛荣誉 -->
+                <section class="bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-2xl p-6 border border-blue-100/50 dark:border-blue-950/20">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-md font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"></circle><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path></svg>
+                            竞赛荣誉 (Highlights)
+                        </h2>
+                        <span class="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded font-medium">荣誉榜</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- 荣誉 1 -->
+                        <div class="bg-white/95 dark:bg-slate-900/90 rounded-xl p-4 border border-blue-50 dark:border-slate-800/40 shadow-sm flex flex-col justify-between hover:scale-105 hover:shadow-md transition-all duration-300">
+                            <div>
+                                <div class="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-950/20 flex items-center justify-center mb-2">
+                                    <svg class="w-5 h-5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 1 6 6v1H6V8a6 6 0 0 1 6-6z"></path></svg>
+                                </div>
+                                <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm">全国高校计算机能力挑战赛</h3>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">全国决赛 · 算法与程序设计</p>
+                            </div>
+                            <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full w-max mt-3">
+                                全国一等奖 🏆
+                            </span>
+                        </div>
+
+                        <!-- 荣誉 2 -->
+                        <div class="bg-white/95 dark:bg-slate-900/90 rounded-xl p-4 border border-blue-50 dark:border-slate-800/40 shadow-sm flex flex-col justify-between hover:scale-105 hover:shadow-md transition-all duration-300">
+                            <div>
+                                <div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-950/20 flex items-center justify-center mb-2">
+                                    <svg class="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15"></path><circle cx="12" cy="15" r="5"></circle></svg>
+                                </div>
+                                <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm">蓝桥杯全国软件大赛</h3>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">个人程序设计全国总决赛</p>
+                            </div>
+                            <span class="text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-full w-max mt-3">
+                                全国二等奖 🥈
+                            </span>
+                        </div>
+
+                        <!-- 荣誉 3 -->
+                        <div class="bg-white/95 dark:bg-slate-900/90 rounded-xl p-4 border border-blue-50 dark:border-slate-800/40 shadow-sm flex flex-col justify-between hover:scale-105 hover:shadow-md transition-all duration-300">
+                            <div>
+                                <div class="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-950/20 flex items-center justify-center mb-2">
+                                    <svg class="w-5 h-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                </div>
+                                <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm">程序设计天梯赛</h3>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">团体程序设计天梯赛</p>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded-full w-max mt-3">
+                                团体全国三等奖 🥉
+                            </span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 实战项目留空区 -->
+                <section class="bg-white/95 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800/50">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-md font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path></svg>
+                            实战项目 (Active Projects)
+                        </h2>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/50 px-2 py-0.5 rounded font-medium">项目库</span>
+                    </div>
+                    
+                    <div class="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-10 flex flex-col items-center justify-center text-center gap-3 bg-slate-50/50 dark:bg-slate-950/20">
+                        <div class="w-12 h-12 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 shadow-sm border border-slate-100 dark:border-slate-800">
+                            <svg class="w-6 h-6 text-slate-400 dark:text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-700 dark:text-slate-300 text-sm">项目档案整理中...</h3>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 mt-1.5 max-w-md leading-relaxed">
+                                目前的项目资料及架构正在重新梳理和升级，此区域暂时留空。后续更新的技术细节和 AI 开发成果将陆续在此发布，敬请期待！
+                            </p>
+                        </div>
+                        <a href="https://github.com/nbfsl123-sketch" target="_blank" class="text-xs text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 font-semibold flex items-center gap-1 mt-3">
+                            前往 GitHub 关注我的最新更新 
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></svg>
+                        </a>
+                    </div>
+                </section>
                 
                 <!-- 页脚 -->
-                <footer class="text-center text-xs text-slate-400 pt-4 flex flex-col md:flex-row justify-between items-center gap-2">
+                <footer class="text-center text-xs text-slate-400 dark:text-slate-600 pt-4 flex flex-col md:flex-row justify-between items-center gap-2">
                     <p>© 2026 周彬 (Zhou Bin) · 西安工业大学</p>
-                    <p class="text-slate-300">Built with ❤️ by Zhou Bin's Digital Twin</p>
+                    <p class="text-slate-300 dark:text-slate-700">Built with ❤️ by Zhou Bin's Digital Twin</p>
                 </footer>
 
             </div>
@@ -251,7 +330,63 @@
 
     <!-- ================= 核心交互 JavaScript ================= -->
     <script>
-        // 模拟的分身知识库
+        // ================= Canvas 统一科技蓝流体轨迹绘制系统 =================
+        const canvas = document.getElementById('trail-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let points = []; 
+        const maxPoints = 35; 
+        let mouse = { x: 0, y: 0 };
+        const themeColor = "14, 165, 233"; 
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            points.push({ x: mouse.x, y: mouse.y });
+            if (points.length > maxPoints) {
+                points.shift();
+            }
+        });
+
+        let frameCount = 0;
+        function drawTrail() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            frameCount++;
+            if (frameCount % 2 === 0 && points.length > 0) {
+                points.shift();
+            }
+
+            if (points.length > 1) {
+                for (let i = 1; i < points.length; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(points[i-1].x, points[i-1].y);
+                    ctx.lineTo(points[i].x, points[i].y);
+                    const ratio = i / points.length;
+                    ctx.lineWidth = ratio * 5;
+                    ctx.strokeStyle = `rgba(${themeColor}, ${ratio * 0.45})`;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.stroke();
+                }
+            }
+            requestAnimationFrame(drawTrail);
+        }
+        drawTrail();
+
+        // ================= 2. 深色/浅色模式切换 =================
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.theme = isDark ? 'dark' : 'light';
+        }
+
+        // ================= 3. 模拟的分身知识库 =================
         const KB = {
             doing: "你好呀！我目前是西安工业大学软件工程专业的大三学生。\n\n因为在大一大二期间经常进行算法训练，我很荣幸斩获了【全国高校计算机能力挑战赛一等奖】、【蓝桥杯全国二等奖】和【天梯赛团体三等奖】。目前我正专注于打牢前端与全栈基础，探索 AI 领域并积极寻找相关的实习机会！",
             projects: "你好！我之前曾用 Vibe Code 工具链折腾过一些项目。\n\n由于最近在集中精力优化底层代码架构，我暂时在主页的『实战项目』版块做了留白。后续等我重新整理好后，会将成果陆续发布到 GitHub 上：https://github.com/nbfsl123-sketch ，欢迎多多关注！",
@@ -266,40 +401,38 @@
         function appendMessage(sender, text, isUser = false) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `flex items-start gap-2 ${isUser ? 'justify-end' : ''}`;
-            
             const avatar = isUser 
                 ? `<div class="w-7 h-7 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-xs font-bold shrink-0 order-2">访</div>`
                 : `<div class="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold shrink-0">彬</div>`;
-            
             const content = `
-                <div class="${isUser ? 'bg-blue-500 text-white rounded-tr-none' : 'bg-white border border-slate-100 text-slate-700 rounded-tl-none'} p-3 rounded-2xl max-w-[85%] shadow-sm leading-relaxed whitespace-pre-line ${isUser ? 'order-1' : ''}">
+                <div class="${isUser ? 'bg-blue-500 text-white rounded-tr-none' : 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 rounded-tl-none'} p-3 rounded-2xl max-w-[85%] shadow-sm leading-relaxed whitespace-pre-line ${isUser ? 'order-1' : ''}">
                     ${text}
                 </div>
             `;
-            
             msgDiv.innerHTML = avatar + content;
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // 模拟分身的输入中状态
+        // 模拟分身的输入中状态（已完美适配深色主题）
         function simulateReply(text) {
             const typingId = 'typing-indicator';
-            const typingDiv = document.createElement('div');
-            typingDiv.id = typingId;
-            typingDiv.className = "flex items-start gap-2";
-            typingDiv.innerHTML = `
+            const typingDiv = document.createElement('createElement');
+            
+            const typingContainer = document.createElement('div');
+            typingContainer.id = typingId;
+            typingContainer.className = "flex items-start gap-2";
+            typingContainer.innerHTML = `
                 <div class="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold shrink-0">彬</div>
-                <div class="bg-white border border-slate-100 text-slate-500 p-3 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1">
+                <div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 p-3 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1 text-slate-500 dark:text-slate-400">
                     <span class="animate-bounce">●</span>
                     <span class="animate-bounce delay-100">●</span>
                     <span class="animate-bounce delay-200">●</span>
                 </div>
             `;
-            chatBox.appendChild(typingDiv);
+            chatBox.appendChild(typingContainer);
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            // 延迟1.2秒，营造思考的感觉
             setTimeout(() => {
                 const indicator = document.getElementById(typingId);
                 if (indicator) indicator.remove();
@@ -310,12 +443,10 @@
         // 触发快捷提问
         function askQuestion(qText) {
             appendMessage('访客', qText, true);
-            
             let reply = KB.default;
             if (qText.includes('做什么') || qText.includes('忙什么')) reply = KB.doing;
             else if (qText.includes('项目')) reply = KB.projects;
             else if (qText.includes('联系')) reply = KB.contact;
-
             simulateReply(reply);
         }
 
@@ -328,7 +459,6 @@
             appendMessage('访客', text, true);
             userInput.value = '';
 
-            // 简单的匹配逻辑
             let reply = KB.default;
             const lowerText = text.toLowerCase();
             if (lowerText.includes('忙什么') || lowerText.includes('做什么') || lowerText.includes('在干嘛') || lowerText.includes('背景') || lowerText.includes('学校')) {
@@ -338,7 +468,6 @@
             } else if (lowerText.includes('联系') || lowerText.includes('邮箱') || lowerText.includes('微信') || lowerText.includes('电话') || lowerText.includes('github') || lowerText.includes('手机')) {
                 reply = KB.contact;
             }
-
             simulateReply(reply);
         }
     </script>
